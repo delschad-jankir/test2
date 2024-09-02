@@ -9,7 +9,6 @@ import {
   Command,
   CreditCard,
   File,
-  FileText,
   HelpCircle,
   Image,
   Laptop,
@@ -37,7 +36,8 @@ import {
   Wrench,
   Sparkle,
   MessageCircle,
-  PlusCircle
+  PlusCircle,
+  FileText
 } from 'lucide-react';
 
 export type Icon = LucideIcon;
@@ -77,6 +77,7 @@ export const Icons = {
   MessageCircle: MessageCircle,
   Sparkle: Sparkle,
   Plus: PlusCircle,
+  FileText: FileText,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

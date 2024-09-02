@@ -20,6 +20,12 @@ export const navItems: NavItem[] = [
     label: 'projects'
   },
   {
+    title: 'Documents',
+    href: '/documents',
+    icon: 'FileText',
+    label: 'documents'
+  },
+  {
     title: 'Profile',
     href: '/dashboard/profile',
     icon: 'profile',
