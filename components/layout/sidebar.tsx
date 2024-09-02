@@ -9,6 +9,8 @@ import { ChevronLeft, ArrowLeft, Plus } from 'lucide-react';
 import { useSidebar } from '@/hooks/useSidebar';
 import Link from 'next/link';
 
+import { Loader } from 'lucide-react';
+
 import { useProjectData } from '@/context/ProjectDataContext';
 import { useUserData } from '@/context/UserDataContext';
 
@@ -65,6 +67,7 @@ export default function Sidebar({ className }: SidebarProps) {
   const { isMinimized, toggle } = useSidebar();
   const pathname = usePathname() || '';
   const [chatNavItems, setChatNavItems] = useState([]);
+  const [loading, setLoading] = useState(false); // New loading state
 
   const isProjectPage = pathname.startsWith('/projects/') && pathname !== '/projects/new';
   const isChatPage = pathname.includes('/chat');
@@ -80,6 +83,7 @@ export default function Sidebar({ className }: SidebarProps) {
   useEffect(() => {
     if (isChatPage) {
       const fetchChatItems = async () => {
+        setLoading(true); // Start loading
         try {
           const response = await fetch('http://localhost:4000/retrieveChats', {
             method: 'POST',
@@ -88,7 +92,7 @@ export default function Sidebar({ className }: SidebarProps) {
             },
             body: JSON.stringify({
               uid: user.uid,
-              projectID: projectData.id
+              projectID: projectData.id,
             }),
           });
 
@@ -104,26 +108,28 @@ export default function Sidebar({ className }: SidebarProps) {
               href: `/projects/${projectId}/general`,
               icon: 'ArrowLeft',
               label: 'Back to Project',
-              forceReload: true // Ensure a full page reload
+              forceReload: true, // Ensure a full page reload
             },
             {
               title: 'New Chat',
               href: `/projects/${projectId}/chat`,
               icon: 'Plus',
               label: 'New Chat',
-              forceReload: true // Ensure a full page reload
+              forceReload: true, // Ensure a full page reload
             },
             ...data.map((chat) => ({
               ...chat, // Spread all key-value pairs from chat data
               href: chat.href || '#', // Ensure href is defined
               label: chat.title || 'No Title', // Provide a fallback if title is missing
-              forceReload: chat.forceReload || false // Default to false if not provided
-            }))
+              forceReload: chat.forceReload || false, // Default to false if not provided
+            })),
           ];
 
           setChatNavItems(sortedChatItems);
         } catch (error) {
           console.error('Error fetching chat items:', error);
+        } finally {
+          setLoading(false); // End loading
         }
       };
 
@@ -131,10 +137,10 @@ export default function Sidebar({ className }: SidebarProps) {
     }
   }, [isChatPage, user, projectData]);
 
-  const projectNavItems = baseProjectNavItems.map(item => ({
+  const projectNavItems = baseProjectNavItems.map((item) => ({
     ...item,
     href: item.slug ? `/projects/${projectId}/${item.slug}` : item.href,
-    forceReload: false // Default to no reload
+    forceReload: false, // Default to no reload
   }));
 
   const getNavItems = () => {
@@ -189,7 +195,13 @@ export default function Sidebar({ className }: SidebarProps) {
       >
         <div className="space-y-4 px-3 py-2">
           <div className="mt-4 space-y-1">
-            <DashboardNav items={getNavItems()} />
+            {loading ? (
+              <div className="flex justify-center items-center h-full">
+                <Loader className="animate-spin h-8 w-8 text-foreground" /> {/* Loading animation */}
+              </div>
+            ) : (
+              <DashboardNav items={getNavItems()} />
+            )}
           </div>
         </div>
       </div>
